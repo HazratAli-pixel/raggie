@@ -29,7 +29,7 @@ export async function POST(req: Request) {
       `https://api.line.me/v2/bot/message/reply`,
       {
         replyToken: payload.events[0].replyToken,
-        messages: [{ type: "text", text: "Reply from api Raggie" }],
+        messages: [{ type: "text", text: "Reply from api Raggie -s" }],
       },
       {
         headers: {
