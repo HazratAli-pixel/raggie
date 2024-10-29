@@ -1,21 +1,21 @@
 import axios from "axios";
 import { NextResponse } from "next/server";
 
-async function getOpenAIResponse(userMessage: string) {
-  const response = await axios.post(
-    "https://api.openai.com/v1/chat/completions",
-    {
-      model: "gpt-3.5-turbo",
-      messages: [{ role: "user", content: userMessage }],
-    },
-    {
-      headers: {
-        Authorization: `Bearer ${process.env.NEXT_PUBLIC_OPENAI_KEY}`,
-      },
-    }
-  );
-  return response.data.choices[0].message.content;
-}
+// async function getOpenAIResponse(userMessage: string) {
+//   const response = await axios.post(
+//     "https://api.openai.com/v1/chat/completions",
+//     {
+//       model: "gpt-3.5-turbo",
+//       messages: [{ role: "user", content: userMessage }],
+//     },
+//     {
+//       headers: {
+//         Authorization: `Bearer ${process.env.NEXT_PUBLIC_OPENAI_KEY}`,
+//       },
+//     }
+//   );
+//   return response.data.choices[0].message.content;
+// }
 
 export async function POST(req: Request) {
   const payload = await req.json();
