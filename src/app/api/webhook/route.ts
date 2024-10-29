@@ -38,8 +38,7 @@ export async function POST(req: NextRequest) {
     );
 
     return NextResponse.json({
-      status: "sucess",
-      code: 200,
+      status: 200,
     });
   }
 }
