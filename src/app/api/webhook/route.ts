@@ -18,16 +18,16 @@ async function getOpenAIResponse(userMessage: string) {
 }
 
 export async function POST(req: NextRequest) {
-  // const payload = await req.text();
-  // console.log("Payload :", payload);
+  const payload = await req.json();
+  console.log("Payload :", payload);
   console.log("Request: ", req);
   if (req.body) {
-    const userMessage: string = await req.body.events[0].message.text;
+    const userMessage: string = await payload.body.events[0].message.text;
     const openAIResponse = await getOpenAIResponse(userMessage);
     await axios.post(
       `https://api.line.me/v2/bot/message/reply`,
       {
-        replyToken: req.body.events[0].replyToken ?? "",
+        replyToken: payload.body.events[0].replyToken ?? "",
         messages: [{ type: "text", text: openAIResponse }],
       },
       {

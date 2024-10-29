@@ -2,7 +2,7 @@ export type LineRES = {
   body: LineRESPONSE;
 };
 
-export type LineRESPONSE = {
+type LineRESPONSE = {
   events: [
     {
       type: string;
