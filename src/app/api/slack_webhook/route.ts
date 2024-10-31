@@ -27,7 +27,7 @@ export async function POST(req: Request) {
   const { event } = payload;
   if (event && event.type === "app_mention") {
     const userMessage = event.text.replace(/<@[^>]+>/, "").trim();
-
+    console.log("userMessage: ", userMessage);
     try {
       // Get ChatGPT response from OpenAI
       const openAIResponse = await getOpenAIResponse(userMessage);
@@ -47,12 +47,13 @@ export async function POST(req: Request) {
         }
       );
 
+      console.log("Success:", openAIResponse);
       return NextResponse.json({ status: "Message sent to Slack" });
     } catch (error) {
       console.error("Error:", error);
       return NextResponse.json({ error: "Failed to process request" });
     }
   }
-
+  console.log("No Action is taken:", event);
   return NextResponse.json({ status: "No action taken" });
 }
