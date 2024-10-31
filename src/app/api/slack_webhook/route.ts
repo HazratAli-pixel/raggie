@@ -1,5 +1,6 @@
 import axios from "axios";
 import { NextResponse } from "next/server";
+// const id: string = process.env.NEXT_PUBLIC_SLACK_BOT_ID!;
 
 async function getOpenAIResponse(userMessage: string) {
   const response = await axios.post(
@@ -54,7 +55,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Failed to process request" });
     }
   }
-  if (event && event.type === "messagea") {
+  if (event && event.type === "message" && event?.bot_id.id === "") {
     const userMessage = event.text.replace(/<@[^>]+>/, "").trim();
     console.log("userMessage: ", userMessage);
     try {
