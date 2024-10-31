@@ -22,25 +22,26 @@ export async function POST(req: Request) {
   console.log("Payload :", payload);
   console.log("Request: ", req);
   if (req.body) {
-    const userMessage: string = await payload.events[0].message.text;
-    const openAIResponse = await getOpenAIResponse(userMessage);
+    // const userMessage: string = await payload.events[0].message.text;
+    const openAIResponse = await getOpenAIResponse(payload.msg);
     console.log("OpenAI Response: ", openAIResponse);
-    await axios.post(
-      "https://slack.com/api/chat.postMessage",
-      {
-        channel: payload.event.channel,
-        text: openAIResponse,
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${process.env.NEXT_PUBLIC_SLACK_CHANNEL_ACCESS_TOKEN}`,
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    // await axios.post(
+    //   "https://slack.com/api/chat.postMessage",
+    //   {
+    //     channel: payload.event.channel,
+    //     text: openAIResponse,
+    //   },
+    //   {
+    //     headers: {
+    //       Authorization: `Bearer ${process.env.NEXT_PUBLIC_SLACK_CHANNEL_ACCESS_TOKEN}`,
+    //       "Content-Type": "application/json",
+    //     },
+    //   }
+    // );
 
     return NextResponse.json({
       statusCode: 200,
+      openAIResponse: openAIResponse,
     });
   }
 }
