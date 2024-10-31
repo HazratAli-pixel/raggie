@@ -25,7 +25,10 @@ export async function POST(req: Request) {
     return NextResponse.json({ challenge: payload.challenge });
   }
   const { event } = payload;
-  if (event && event.type === "app_mention") {
+  if (
+    (event && event.type === "app_mention") ||
+    (event && event.type === "message")
+  ) {
     const userMessage = event.text.replace(/<@[^>]+>/, "").trim();
     console.log("userMessage: ", userMessage);
     try {
