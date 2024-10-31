@@ -26,8 +26,8 @@ export async function POST(req: Request) {
   }
   const { event } = payload;
   if (
-    (event && event.type === "app_mention") ||
-    (event && event.type === "message")
+    (event && event.type === "app_mentiona") ||
+    (event && event.type === "messagea")
   ) {
     const userMessage = event.text.replace(/<@[^>]+>/, "").trim();
     console.log("userMessage: ", userMessage);
