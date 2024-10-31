@@ -54,7 +54,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Failed to process request" });
     }
   }
-  if (event && event.type === "message") {
+  if (event && event.type === "messagea") {
     const userMessage = event.text.replace(/<@[^>]+>/, "").trim();
     console.log("userMessage: ", userMessage);
     try {
