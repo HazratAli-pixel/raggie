@@ -54,6 +54,35 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Failed to process request" });
     }
   }
+  if (event && event.type === "message") {
+    const userMessage = event.text.replace(/<@[^>]+>/, "").trim();
+    console.log("userMessage: ", userMessage);
+    try {
+      // Get ChatGPT response from OpenAI
+      const openAIResponse = await getOpenAIResponse(userMessage);
+      console.log("response: ", openAIResponse);
+      // Send response to Slack
+      await axios.post(
+        "https://slack.com/api/chat.postMessage",
+        {
+          channel: event.channel,
+          text: openAIResponse,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${process.env.NEXT_PUBLIC_SLACK_CHANNEL_ACCESS_TOKEN}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      console.log("Success:", openAIResponse);
+      return NextResponse.json({ status: "Message sent to Slack" });
+    } catch (error) {
+      console.error("Error:", error);
+      return NextResponse.json({ error: "Failed to process request" });
+    }
+  }
   console.log("No Action is taken:", event);
   return NextResponse.json({ status: "No action taken" });
 }
