@@ -20,6 +20,7 @@ async function getOpenAIResponse(userMessage: string) {
 export async function POST(req: Request) {
   const payload = await req.json();
   const userMessage: string = payload.message;
+  console.log("Payload :", payload)
 
   if (userMessage) {
     const openAIResponse = await getOpenAIResponse(userMessage);
