@@ -38,9 +38,12 @@ async function getUserName(userid: number) {
       },
     }
   );
+  console.log("line 41 abc: ", abc)
   const response = abc ?? []
+  console.log("line 43 response: ", response)
   if(response.length>=1){
     const username: Usertype | undefined = await response.find((user)=>user.account_id===userid)
+    console.log("line 46 username : ", username)
     if(username)
     return username.name;
   }
