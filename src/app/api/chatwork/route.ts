@@ -39,7 +39,7 @@ export async function POST(req: Request) {
       // Ensure body parameter is explicitly set as expected by Chatwork
       await axios.post(
         `https://api.chatwork.com/v2/rooms/${chatworkRoomId}/messages`,
-        new URLSearchParams({ body: `[to:${payload.webhook_event.to_account_id}]${openAIResponse}` }).toString(), // Correct format for sending `body` text
+        new URLSearchParams({ body: `[To:${payload.webhook_event.from_account_id}]${openAIResponse}` }).toString(), // Correct format for sending `body` text
         {
           headers: {
             "X-ChatWorkToken": chatworkApiToken,
