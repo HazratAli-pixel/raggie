@@ -22,13 +22,13 @@ export async function POST(req: Request) {
   const userMessage: string = payload.webhook_event.body;
   console.log("Payload :", payload)
 
-  if (userMessage) {
+  if (userMessage && payload.webhook_event.account_id != 9836088 ) {
     const openAIResponse = await getOpenAIResponse(userMessage);
     console.log("OpenAI Response: ", openAIResponse);
 
     const chatworkApiToken = process.env.NEXT_PUBLIC_CHATWORK_TOKEN;
-    const chatworkRoomId = payload.webhook_event.room_llidd;
-    
+    const chatworkRoomId = payload.webhook_event.room_id;
+
     console.log("chatworkApiToken: ", chatworkApiToken);
     console.log("chatworkRoomId: ", chatworkRoomId);
 
