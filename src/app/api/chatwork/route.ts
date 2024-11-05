@@ -48,10 +48,10 @@ export async function POST(req: Request) {
         openaiResponse: openAIResponse,
       });
     } catch (error) {
-      console.error("Chatwork API Error:", error.response?.data || error.message);
+      console.error("Chatwork API Error:", error);
       return NextResponse.json({
-        statusCode: error.response?.status || 500,
-        error: error.response?.data || "An error occurred",
+        statusCode: 500,
+        error: "An error occurred",
       });
     }
   }
