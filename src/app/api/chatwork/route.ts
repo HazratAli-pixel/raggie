@@ -30,7 +30,7 @@ type Usertype = {
   }
 async function getUserName(userid: number) {
 
-  const abc: Usertype[] = await axios.get(
+  const abc = await axios.get(
     `https://api.chatwork.com/v2/contacts`,
     {
       headers: {
@@ -38,8 +38,10 @@ async function getUserName(userid: number) {
       },
     }
   );
+  const rendom: Usertype[] = abc.data.json()
+  console.log("random : ", rendom)
   console.log("line 41 abc: ", abc)
-  const response = abc ?? []
+  const response = rendom ?? []
   console.log("line 43 response: ", response)
   if(response.length>=1){
     const username: Usertype | undefined = await response.find((user)=>user.account_id===userid)
