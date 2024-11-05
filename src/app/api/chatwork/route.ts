@@ -27,7 +27,8 @@ export async function POST(req: Request) {
     console.log("OpenAI Response: ", openAIResponse);
 
     const chatworkApiToken = process.env.NEXT_PUBLIC_CHATWORK_TOKEN;
-    const chatworkRoomId = payload.webhook_event.room_id;
+    const chatworkRoomId = payload.webhook_event.room_llidd;
+    
     console.log("chatworkApiToken: ", chatworkApiToken);
     console.log("chatworkRoomId: ", chatworkRoomId);
 
