@@ -1,6 +1,8 @@
 import axios from "axios";
 import { NextResponse } from "next/server";
 
+const chatworkApiToken = process.env.NEXT_PUBLIC_CHATWORK_TOKEN;
+
 async function getOpenAIResponse(userMessage: string) {
   const response = await axios.post(
     "https://api.openai.com/v1/chat/completions",
@@ -16,6 +18,35 @@ async function getOpenAIResponse(userMessage: string) {
   );
   return response.data.choices[0].message.content;
 }
+type Usertype = {
+  account_id: number,
+  room_id: number,
+  name: string,
+  chatwork_id: string,
+  organization_id: number,
+  organization_name: string,
+  department: string,
+  avatar_image_url: string
+  }
+async function getUserName(userid: number) {
+
+  const abc: Usertype[] = await axios.get(
+    `https://api.chatwork.com/v2/contacts`,
+    {
+      headers: {
+        "X-ChatWorkToken": chatworkApiToken,
+      },
+    }
+  );
+  const response = abc ?? []
+  if(response.length>=1){
+    const username: Usertype | undefined = response.find((user)=>user.account_id===userid)
+    if(username)
+    return username.name;
+  }
+  
+
+}
 
 export async function POST(req: Request) {
   const payload = await req.json();
@@ -29,7 +60,7 @@ export async function POST(req: Request) {
     const openAIResponse = await getOpenAIResponse(userMessage);
     console.log("OpenAI Response: ", openAIResponse);
 
-    const chatworkApiToken = process.env.NEXT_PUBLIC_CHATWORK_TOKEN;
+    const username = await getUserName(payload.webhook_event.from_account_id)
     const chatworkRoomId = payload.webhook_event.room_id;
 
     console.log("chatworkApiToken: ", chatworkApiToken);
@@ -39,7 +70,7 @@ export async function POST(req: Request) {
       // Ensure body parameter is explicitly set as expected by Chatwork
       await axios.post(
         `https://api.chatwork.com/v2/rooms/${chatworkRoomId}/messages`,
-        new URLSearchParams({ body: `[To:${payload.webhook_event.from_account_id}]${openAIResponse}` }).toString(), // Correct format for sending `body` text
+        new URLSearchParams({ body: `[To:${payload.webhook_event.from_account_id}]${username}"\n"${openAIResponse}` }).toString(), // Correct format for sending `body` text
         {
           headers: {
             "X-ChatWorkToken": chatworkApiToken,
