@@ -19,10 +19,13 @@ async function getOpenAIResponse(userMessage: string) {
 
 export async function POST(req: Request) {
   const payload = await req.json();
-  const userMessage: string = payload.webhook_event.body;
+  const userMessages: string = payload.webhook_event.body;
+  const userMessage: string = userMessages.slice(12)
   console.log("Payload :", payload)
 
-  if (userMessage && payload.webhook_event.account_id != 9836088 ) {
+  if (payload.webhook_event_type === "mention_to_me" ) {
+
+  // if (userMessage && payload.webhook_event.account_id != 9836088 ) {
     const openAIResponse = await getOpenAIResponse(userMessage);
     console.log("OpenAI Response: ", openAIResponse);
 
@@ -36,7 +39,7 @@ export async function POST(req: Request) {
       // Ensure body parameter is explicitly set as expected by Chatwork
       await axios.post(
         `https://api.chatwork.com/v2/rooms/${chatworkRoomId}/messages`,
-        new URLSearchParams({ body: openAIResponse }).toString(), // Correct format for sending `body` text
+        new URLSearchParams({ body: `[to:${payload.webhook_event.from_account_id}]${openAIResponse}` }).toString(), // Correct format for sending `body` text
         {
           headers: {
             "X-ChatWorkToken": chatworkApiToken,
