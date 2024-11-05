@@ -40,7 +40,7 @@ async function getUserName(userid: number) {
   );
   const response = abc ?? []
   if(response.length>=1){
-    const username: Usertype | undefined = response.find((user)=>user.account_id===userid)
+    const username: Usertype | undefined = await response.find((user)=>user.account_id===userid)
     if(username)
     return username.name;
   }
@@ -70,7 +70,7 @@ export async function POST(req: Request) {
       // Ensure body parameter is explicitly set as expected by Chatwork
       await axios.post(
         `https://api.chatwork.com/v2/rooms/${chatworkRoomId}/messages`,
-        new URLSearchParams({ body: `[To:${payload.webhook_event.from_account_id}]${username}"\n"${openAIResponse}` }).toString(), // Correct format for sending `body` text
+        new URLSearchParams({ body: `[To:${payload.webhook_event.from_account_id}]${username}\n${openAIResponse}` }).toString(), // Correct format for sending `body` text
         {
           headers: {
             "X-ChatWorkToken": chatworkApiToken,
