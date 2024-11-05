@@ -19,7 +19,7 @@ async function getOpenAIResponse(userMessage: string) {
 
 export async function POST(req: Request) {
   const payload = await req.json();
-  const userMessage: string = payload.message;
+  const userMessage: string = payload.webhook_event.body;
   console.log("Payload :", payload)
 
   if (userMessage) {
