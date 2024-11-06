@@ -2,6 +2,11 @@ import axios from "axios";
 import { NextResponse } from "next/server";
 
 const chatworkApiToken = process.env.NEXT_PUBLIC_CHATWORK_TOKEN;
+type Usertype = {
+  account_id: number;
+  room_id: number;
+  name: string;
+};
 
 async function getOpenAIResponse(userMessage: string) {
   const response = await axios.post(
@@ -18,67 +23,46 @@ async function getOpenAIResponse(userMessage: string) {
   );
   return response.data.choices[0].message.content;
 }
-type Usertype = {
-  account_id: number,
-  room_id: number,
-  name: string,
-  }
+
 async function getUserName(userid: number) {
-
-  const abc = await axios.get(
-    `https://api.chatwork.com/v2/contacts`,
-    {
-      headers: {
-        "X-ChatWorkToken": chatworkApiToken,
-      },
-    }
-  );
-  const rendom: Usertype[] = abc.data
-  console.log("random : ", rendom)
-  console.log("line 41 abc: ", abc)
-  const response = rendom ?? []
-  console.log("line 43 response: ", response)
-  if(response.length>=1){
-    const username: Usertype | undefined = await response.find((user)=>user.account_id===userid)
-    console.log("line 46 username : ", username)
-    if(username)
-    return username.name;
+  const response = await axios.get(`https://api.chatwork.com/v2/contacts`, {
+    headers: {
+      "X-ChatWorkToken": chatworkApiToken,
+    },
+  });
+  const users: Usertype[] = response.data ?? [];
+  if (users.length >= 1) {
+    const username: Usertype | undefined = await users.find(
+      (user) => user.account_id === userid
+    );
+    if (username) return username.name;
   }
-  
-
 }
 
 export async function POST(req: Request) {
   const payload = await req.json();
   const userMessages: string = payload.webhook_event.body;
-  const userMessage: string = userMessages.slice(12)
-  console.log("Payload :", payload)
+  const userMessage: string = userMessages.slice(12);
 
-  if (payload.webhook_event_type === "mention_to_me" ) {
-
-  // if (userMessage && payload.webhook_event.account_id != 9836088 ) {
+  if (payload.webhook_event_type === "mention_to_me") {
     const openAIResponse = await getOpenAIResponse(userMessage);
-    console.log("OpenAI Response: ", openAIResponse);
 
-    const username = await getUserName(payload.webhook_event.from_account_id)
+    const username = await getUserName(payload.webhook_event.from_account_id);
     const chatworkRoomId = payload.webhook_event.room_id;
 
-    console.log("chatworkApiToken: ", chatworkApiToken);
-    console.log("chatworkRoomId: ", chatworkRoomId);
-
     try {
-      // Ensure body parameter is explicitly set as expected by Chatwork
       await axios.post(
         `https://api.chatwork.com/v2/rooms/${chatworkRoomId}/messages`,
-        new URLSearchParams({ body: `[To:${payload.webhook_event.from_account_id}]${username}\n${openAIResponse}` }).toString(), // Correct format for sending `body` text
+        new URLSearchParams({
+          body: `[To:${payload.webhook_event.from_account_id}]${username}\n${openAIResponse}`,
+        }).toString(),
         {
           headers: {
             "X-ChatWorkToken": chatworkApiToken,
-            "Content-Type": "application/x-www-form-urlencoded", // Needed for URL-encoded format
+            "Content-Type": "application/x-www-form-urlencoded",
           },
         }
       );
-
       return NextResponse.json({
         statusCode: 200,
         openaiResponse: openAIResponse,
