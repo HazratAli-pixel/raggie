@@ -23,23 +23,26 @@ export async function POST(req: Request) {
   console.log("Request: ", req);
   if (req.body) {
     const userMessage: string = await payload.events[0].message.text;
+    const mentioned = userMessage.includes("@ALEX");
+    console.log("Mention", mentioned, userMessage);
     const openAIResponse = await getOpenAIResponse(userMessage);
-    console.log("OpenAI Response: ", openAIResponse);
-    await axios.post(
-      `https://api.line.me/v2/bot/message/reply`,
-      {
-        replyToken: payload.events[0].replyToken,
-        messages: [{ type: "text", text: openAIResponse }],
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${process.env.NEXT_PUBLIC_LINE_CHANNEL_ACCESS_TOKEN}`,
+    if (mentioned) {
+      await axios.post(
+        `https://api.line.me/v2/bot/message/reply`,
+        {
+          replyToken: payload.events[0].replyToken,
+          messages: [{ type: "text", text: openAIResponse }],
         },
-      }
-    );
+        {
+          headers: {
+            Authorization: `Bearer ${process.env.NEXT_PUBLIC_LINE_CHANNEL_ACCESS_TOKEN}`,
+          },
+        }
+      );
 
-    return NextResponse.json({
-      statusCode: 200,
-    });
+      return NextResponse.json({
+        statusCode: 200,
+      });
+    }
   }
 }
