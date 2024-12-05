@@ -35,9 +35,10 @@ export async function POST(req: Request) {
 
   if (req.body) {
     const userMessage: string = await payload.events[0].message.text;
-    const userMessages = userMessage.replace(/<@[^>]+>/, "").trim();
-    const mentioned = userMessage.includes("@ALEX");
-    console.log("Mention", mentioned, userMessage, userMessages);
+    const userMessages = userMessage.replace(/@\w+/g, "").trim();
+    const mentionsWord = userMessage.match(/@\w+/g);
+    const mentioned = userMessage.includes(String(mentionsWord));
+    console.log("Mention", mentioned, userMessage, userMessages, mentionsWord);
     const openAIResponse = await getOpenAIResponse(userMessages);
     if (mentioned) {
       await axios.post(
