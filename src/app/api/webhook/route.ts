@@ -18,6 +18,7 @@ async function getOpenAIResponse(userMessage: string) {
 }
 
 export async function POST(req: Request) {
+  const payloadd = (await req.text()) as string;
   const payload = await req.json();
   console.log("Payload :", payload);
   console.log("Request: ", req);
@@ -25,6 +26,7 @@ export async function POST(req: Request) {
   // const rawBody = await req.text();
   // console.log("rawBody: ", rawBody);
 
+  console.log("payloadd: ", payloadd);
   if (!signature) {
     return NextResponse.json({ error: "Missing signature" }, { status: 400 });
   }
