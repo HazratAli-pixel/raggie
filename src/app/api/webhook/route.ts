@@ -18,15 +18,15 @@ async function getOpenAIResponse(userMessage: string) {
 }
 
 export async function POST(req: Request) {
-  const payloadd = (await req.text()) as string;
+  const rowBody = await req.text();
   const signature = req.headers.get("x-line-signature");
-  console.log("payloadd: ", payloadd);
+  console.log("Body: ", rowBody);
   if (!signature) {
     return NextResponse.json({ error: "Missing signature" }, { status: 400 });
   }
   const hash = crypto
     .createHmac("sha256", process.env.NEXT_PUBLIC_LINE_CHANNEL_ACCESS_TOKEN!)
-    .update(payloadd)
+    .update(rowBody)
     .digest("base64");
   console.log("hash: ", hash);
   console.log("signature: ", signature);
