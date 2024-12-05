@@ -38,13 +38,8 @@ export async function POST(req: Request) {
     const userMessages = userMessage.replace(/@\w+/g, "").trim();
     const mentionsWord: string[] = userMessage.match(/@\w+/g) || [];
     const mentioned = userMessage.includes(String(mentionsWord[0]));
-    console.log(
-      "Mention",
-      mentioned,
-      userMessage,
-      userMessages,
-      mentionsWord[0]
-    );
+    console.log("Info", mentioned, userMessage, userMessages, mentionsWord[0]);
+    console.log("payload", payload);
     const openAIResponse = await getOpenAIResponse(userMessages);
     if (mentioned) {
       await axios.post(
