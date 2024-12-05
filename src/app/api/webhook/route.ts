@@ -40,6 +40,7 @@ export async function POST(req: Request) {
     const mentioned = userMessage.includes(String(mentionsWord[0]));
     console.log("Info", mentioned, userMessage, userMessages, mentionsWord[0]);
     console.log("payload", payload);
+    console.log("message Object", payload.events[0].message);
     const openAIResponse = await getOpenAIResponse(userMessages);
     if (mentioned) {
       await axios.post(
