@@ -21,10 +21,13 @@ export async function POST(req: Request) {
   const payload = await req.json();
   console.log("Payload :", payload);
   console.log("Request: ", req);
-
+  const userMessages: string = await payload.events[0].message.text;
+  console.log("userMessages: ", userMessages);
   const rawBody = await req.text();
+  console.log("rawBody: ", rawBody);
+  console.log("req headers: ", req.headers);
   const signature = req.headers.get("x-line-signature");
-  console.log("rawBody: ", rawBody + "signature: ", signature);
+  console.log("signature: ", signature);
 
   // if (!signature) {
   //   return NextResponse.json({ error: "Missing signature" }, { status: 400 });
