@@ -25,7 +25,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Missing signature" }, { status: 400 });
   }
   const hash = crypto
-    .createHmac("sha256", process.env.NEXT_PUBLIC_LINE_CHANNEL_ACCESS_TOKEN!)
+    .createHmac("sha256", "bed207df519919d69768f3190d0b2565")
     .update(rowBody)
     .digest("base64");
   console.log("hash: ", hash);
@@ -34,7 +34,8 @@ export async function POST(req: Request) {
   if (hash !== signature) {
     return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
   }
-  const payload = await req.json();
+  const payload = await JSON.parse(rowBody);
+  // const payload = await req.json();
   console.log("Payload :", payload);
   console.log("Request: ", req);
 
