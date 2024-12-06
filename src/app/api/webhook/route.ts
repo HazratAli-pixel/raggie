@@ -35,7 +35,9 @@ export async function POST(req: Request) {
 
   if (req.body) {
     const userMessage: string = await payload.events[0].message.text;
-    // const mention = await payload.events[0].message.mention.mentionees[0].isSelf
+    const mention = await payload.events[0].message.mention.mentionees[0]
+      .isSelf;
+    const user = await payload.events[0].message.source.userId;
     const userMessages = userMessage.replace(/@\w+/g, "").trim();
     const mentionsWord: string[] = userMessage.match(/@\w+/g) || [];
     const mentioned = userMessage.includes(String(mentionsWord[0]));
@@ -43,41 +45,40 @@ export async function POST(req: Request) {
     console.log("payload", payload);
     console.log("message Object", payload.events[0].message);
     const openAIResponse = await getOpenAIResponse(userMessages);
-    // if (mention) {
-    await axios.post(
-      `https://api.line.me/v2/bot/message/reply`,
-      {
-        replyToken: payload.events[0].replyToken,
-        messages: [{ type: "text", text: openAIResponse }],
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${process.env.NEXT_PUBLIC_LINE_CHANNEL_ACCESS_TOKEN}`,
+    if (mention) {
+      await axios.post(
+        `https://api.line.me/v2/bot/message/reply`,
+        {
+          replyToken: payload.events[0].replyToken,
+          messages: [{ type: "text", text: `@${user} ${openAIResponse}` }],
         },
-      }
-    );
+        {
+          headers: {
+            Authorization: `Bearer ${process.env.NEXT_PUBLIC_LINE_CHANNEL_ACCESS_TOKEN}`,
+          },
+        }
+      );
 
-    return NextResponse.json({
-      statusCode: 200,
-    });
-    // }
-    // if (mention) {
-    // await axios.post(
-    //   `https://api.line.me/v2/bot/message/reply`,
-    //   {
-    //     replyToken: payload.events[0].replyToken,
-    //     messages: [{ type: "text", text: openAIResponse }],
-    //   },
-    //   {
-    //     headers: {
-    //       Authorization: `Bearer ${process.env.NEXT_PUBLIC_LINE_CHANNEL_ACCESS_TOKEN}`,
-    //     },
-    //   }
-    // );
+      return NextResponse.json({
+        statusCode: 200,
+      });
+    } else {
+      await axios.post(
+        `https://api.line.me/v2/bot/message/reply`,
+        {
+          replyToken: payload.events[0].replyToken,
+          messages: [{ type: "text", text: openAIResponse }],
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${process.env.NEXT_PUBLIC_LINE_CHANNEL_ACCESS_TOKEN}`,
+          },
+        }
+      );
 
-    // return NextResponse.json({
-    //   statusCode: 200,
-    // });
-    // }
+      return NextResponse.json({
+        statusCode: 200,
+      });
+    }
   }
 }
