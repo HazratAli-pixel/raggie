@@ -21,7 +21,7 @@ async function getOpenAIResponse(userMessage: string) {
 }
 
 async function checkBotStatus(userId: string) {
-  const url = `https://slack.com/api/users.info?${userId}`;
+  const url = `https://slack.com/api/users.info?user=${userId}`;
   const headers = {
     Authorization: `Bearer ${process.env.NEXT_PUBLIC_SLACK_CHANNEL_ACCESS_TOKEN}`,
     "Content-Type": "application/json",
