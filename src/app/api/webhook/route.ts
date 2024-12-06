@@ -35,8 +35,6 @@ export async function POST(req: Request) {
 
   if (req.body) {
     const userMessage: string = await payload.events[0].message.text;
-    const mention = await payload.events[0].message.mention.mentionees[0]
-      .isSelf;
     const user = await payload.events[0].message.source.userId;
     const userMessages = userMessage.replace(/@\w+/g, "").trim();
     const mentionsWord: string[] = userMessage.match(/@\w+/g) || [];
@@ -45,7 +43,7 @@ export async function POST(req: Request) {
     console.log("payload", payload);
     console.log("message Object", payload.events[0].message);
     const openAIResponse = await getOpenAIResponse(userMessages);
-    if (mention) {
+    if (mentioned) {
       await axios.post(
         `https://api.line.me/v2/bot/message/reply`,
         {
