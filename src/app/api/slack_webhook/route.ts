@@ -20,6 +20,19 @@ async function getOpenAIResponse(userMessage: string) {
   return response.data.choices[0].message.content;
 }
 
+async function checkBotStatus(userId: string) {
+  const status = await axios.get(
+    `https://slack.com/api/users.info?user=${userId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${process.env.NEXT_PUBLIC_SLACK_CHANNEL_ACCESS_TOKEN}`,
+      },
+    }
+  );
+  console.log("status: ", status);
+  return status;
+}
+
 export async function POST(req: Request) {
   const rawBody = await req.text();
   const timestamp = req.headers.get("x-slack-request-timestamp");
@@ -106,13 +119,17 @@ export async function POST(req: Request) {
       const userMessage = event.text;
       const userId = event.user;
       const channel = event.channel;
-
+      const userMessages = userMessage.replace(/<@([A-Z0-9]+)>/g, "").trim();
+      const mentions = userMessage.match(/<@([A-Z0-9]+)>/) || [];
+      // const mentioned = msg.match(/<@([A-Z0-9]+)>/g) || [];
+      const botStaus = await checkBotStatus(mentions);
       // Check if the bot is mentioned
-      if (userMessage.includes(`<@A07UXPB98QY>`)) {
+      console.log("botStaus: ", botStaus);
+      if (botStaus) {
         console.log(
-          `Bot mentioned by user ${userId} in channel ${channel}: ${userMessage}`
+          `Bot mentioned by user ${userId} in channel ${channel}: ${userMessages}`
         );
-        const responseText = await getOpenAIResponse(userMessage);
+        const responseText = await getOpenAIResponse(userMessages);
         await axios.post(
           "https://slack.com/api/chat.postMessage",
           {
