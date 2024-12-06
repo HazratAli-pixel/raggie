@@ -21,14 +21,14 @@ async function getOpenAIResponse(userMessage: string) {
 }
 
 async function checkBotStatus(userId: string) {
-  const status = await axios.get(
-    `https://slack.com/api/users.info?user=${userId}`,
-    {
-      headers: {
-        Authorization: `Bearer ${process.env.NEXT_PUBLIC_SLACK_CHANNEL_ACCESS_TOKEN}`,
-      },
-    }
-  );
+  const status = await axios.get(`https://slack.com/api/users.info`, {
+    params: {
+      user: userId,
+    },
+    headers: {
+      Authorization: `Bearer ${process.env.NEXT_PUBLIC_SLACK_CHANNEL_ACCESS_TOKEN}`,
+    },
+  });
   console.log("status: ", status);
   return status.data.users;
 }
@@ -119,9 +119,11 @@ export async function POST(req: Request) {
       const userMessage = event.text;
       const userId = event.user;
       const channel = event.channel;
+      console.log("userMessage: ", userMessage);
       const userMessages = userMessage.replace(/<@([A-Z0-9]+)>/g, "").trim();
+      console.log("userMessages: ", userMessages);
       const mentions = userMessage.match(/<@([A-Z0-9]+)>/) || [];
-      // const mentioned = msg.match(/<@([A-Z0-9]+)>/g) || [];
+      console.log("mentions: ", mentions[1]);
       const botStaus = await checkBotStatus(mentions[1]);
       // Check if the bot is mentioned
       console.log("botStaus: ", botStaus);
