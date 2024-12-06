@@ -43,7 +43,7 @@ export async function POST(req: Request) {
     const openAIResponse = await getOpenAIResponse(userMessages);
     const userType = await payload.events[0].source.type;
     if (userType === "group") {
-      const mentioned = await payload.events[0].message.mention.mentionees
+      const mentioned = await payload.events[0].message.mention.mentionees[0]
         .isSelf;
       if (mentioned) {
         await axios.post(
