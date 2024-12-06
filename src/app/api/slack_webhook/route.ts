@@ -22,15 +22,13 @@ async function getOpenAIResponse(userMessage: string) {
 
 export async function POST(req: Request) {
   const rawBody = await req.text();
-  console.log("rawBody:", rawBody);
   const timestamp = req.headers.get("x-slack-request-timestamp");
-  console.log("timestamp:", timestamp);
   const signature = req.headers.get("x-slack-signature");
-  console.log("signature:", signature);
 
   if (!timestamp || !signature) {
     return NextResponse.json({ error: "Missing headers" }, { status: 400 });
   }
+
   const currentTime = Math.floor(Date.now() / 1000);
   if (Math.abs(currentTime - parseInt(timestamp)) > 300) {
     return NextResponse.json(
@@ -39,19 +37,15 @@ export async function POST(req: Request) {
     );
   }
   const baseString = `v0:${timestamp}:${rawBody}`;
-
   const hmac = crypto.createHmac("sha256", "bf70159e7abaf31fd077d8095501ad1a");
   hmac.update(baseString);
   const computedSignature = `v0=${hmac.digest("hex")}`;
 
-  console.log("hash: ", computedSignature);
-
-  // Compare signatures
   if (computedSignature !== signature) {
     return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
   }
   console.log("second if okay");
-  const payload = await req.json();
+  const payload = await JSON.parse(rawBody);
   console.log("Payload :", payload);
   console.log("Request: ", req);
   if (payload.type === "url_verification") {
