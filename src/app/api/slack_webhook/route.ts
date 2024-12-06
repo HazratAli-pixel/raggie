@@ -122,7 +122,7 @@ export async function POST(req: Request) {
       const userMessages = userMessage.replace(/<@([A-Z0-9]+)>/g, "").trim();
       const mentions = userMessage.match(/<@([A-Z0-9]+)>/) || [];
       // const mentioned = msg.match(/<@([A-Z0-9]+)>/g) || [];
-      const botStaus = await checkBotStatus(mentions);
+      const botStaus = await checkBotStatus(mentions[1]);
       // Check if the bot is mentioned
       console.log("botStaus: ", botStaus);
       if (botStaus) {
