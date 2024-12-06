@@ -115,10 +115,10 @@ export async function POST(req: Request) {
     }
 
     // Handle mentions in channels
-    if (event.type === "message" && event.channel_type === "channel") {
+    if (event.type === "app_mention") {
       const userMessage = event.text;
       const userId = event.user;
-      const channel = event.channel;
+      // const channel = event.channel;
       console.log("userMessage: ", userMessage);
       const userMessages = userMessage.replace(/<@([A-Z0-9]+)>/g, "").trim();
       console.log("userMessages: ", userMessages);
@@ -129,7 +129,7 @@ export async function POST(req: Request) {
       console.log("botStaus: ", botStaus);
       if (botStaus.is_bot) {
         console.log(
-          `Bot mentioned by user ${userId} in channel ${channel}: ${userMessages}`
+          `Bot mentioned by user ${userId} in channel: ${userMessages}`
         );
         const responseText = await getOpenAIResponse(userMessages);
         await axios.post(
