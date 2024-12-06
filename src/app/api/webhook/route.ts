@@ -32,7 +32,9 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
   }
   const payload = await JSON.parse(rowBody);
+  console.log("message Object", payload.events[0].message);
 
+  console.log("payload", payload);
   if (req.body) {
     const userMessage: string = await payload.events[0].message.text;
     const user = await payload.events[0].message.source.userId;
@@ -40,8 +42,6 @@ export async function POST(req: Request) {
     const mentionsWord: string[] = userMessage.match(/@\w+/g) || [];
     const mentioned = userMessage.includes(String(mentionsWord[0]));
     console.log("Info", mentioned, userMessage, userMessages, mentionsWord[0]);
-    console.log("payload", payload);
-    console.log("message Object", payload.events[0].message);
     const openAIResponse = await getOpenAIResponse(userMessages);
     if (mentioned) {
       await axios.post(
