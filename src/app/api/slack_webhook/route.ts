@@ -1,4 +1,4 @@
-import axios, { AxiosResponse } from "axios";
+import axios from "axios";
 import { NextResponse } from "next/server";
 // const id: string = process.env.NEXT_PUBLIC_SLACK_BOT_ID!;
 import crypto from "crypto";
@@ -21,21 +21,37 @@ async function getOpenAIResponse(userMessage: string) {
 }
 
 async function checkBotStatus(userId: string) {
-  const status: AxiosResponse = await axios.get(
-    `https://slack.com/api/users.info`,
-    {
-      params: {
-        user: userId,
-      },
-      headers: {
-        Authorization: `Bearer ${process.env.NEXT_PUBLIC_SLACK_CHANNEL_ACCESS_TOKEN}`,
-        "Content-Type": "application/json",
-      },
-    }
-  );
+  const url = `https://slack.com/api/users.info?${userId}`;
+  const headers = {
+    Authorization: `Bearer ${process.env.NEXT_PUBLIC_SLACK_CHANNEL_ACCESS_TOKEN}`,
+    "Content-Type": "application/json",
+    Accept: "application/json",
+  };
+  try {
+    const response = await fetch(url, {
+      method: "GET",
+      headers: headers,
+    });
 
-  console.log("status: ", status);
-  return status.data.users;
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log("Data:", data);
+    return data.data.users;
+  } catch (error) {
+    console.error("Error:", error);
+  }
+  // const status = await axios.get(`https://slack.com/api/users.info`, {
+  //   params: {
+  //     user: userId,
+  //   },
+  //   headers: {
+  //     Authorization: `Bearer ${process.env.NEXT_PUBLIC_SLACK_CHANNEL_ACCESS_TOKEN}`,
+  //     "Content-Type": "application/json",
+  //   },
+  // });
 }
 
 export async function POST(req: Request) {
@@ -128,8 +144,9 @@ export async function POST(req: Request) {
       const userMessages = userMessage.replace(/<@([A-Z0-9]+)>/g, "").trim();
       console.log("userMessages: ", userMessages);
       const mentions = userMessage.match(/<@([A-Z0-9]+)>/) || [];
+      const id = mentions[1];
       console.log("mentions: ", mentions[1]);
-      const botStaus = await checkBotStatus(mentions[1]);
+      const botStaus = await checkBotStatus(id);
       // Check if the bot is mentioned
       console.log("botStaus: ", botStaus);
       if (botStaus.is_bot) {
