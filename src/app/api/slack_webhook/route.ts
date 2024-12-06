@@ -38,17 +38,16 @@ export async function POST(req: Request) {
       { status: 400 }
     );
   }
-  console.log("if section");
-  const hash = crypto
-    .createHmac("sha256", "bf70159e7abaf31fd077d8095501ad1a")
-    .update(rawBody)
-    .digest("base64");
-  // .digest("hex");
-  const calculatedSignature = `v0=${hash}`;
-  console.log("hash: ", hash);
+  const baseString = `v0:${timestamp}:${rawBody}`;
+
+  const hmac = crypto.createHmac("sha256", "bf70159e7abaf31fd077d8095501ad1a");
+  hmac.update(baseString);
+  const computedSignature = `v0=${hmac.digest("hex")}`;
+
+  console.log("hash: ", computedSignature);
 
   // Compare signatures
-  if (calculatedSignature !== signature) {
+  if (computedSignature !== signature) {
     return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
   }
   console.log("second if okay");
