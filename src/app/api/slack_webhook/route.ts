@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
 import { NextResponse } from "next/server";
 // const id: string = process.env.NEXT_PUBLIC_SLACK_BOT_ID!;
 import crypto from "crypto";
@@ -21,17 +21,19 @@ async function getOpenAIResponse(userMessage: string) {
 }
 
 async function checkBotStatus(userId: string) {
-  const status = await axios.get(`https://slack.com/api/users.info`, {
-    params: {
-      user: userId,
-    },
-    headers: {
-      Authorization: `Bearer ${process.env.NEXT_PUBLIC_SLACK_CHANNEL_ACCESS_TOKEN}`,
-      "Content-Type": "application/json",
-    },
-  });
+  const status: AxiosResponse = await axios.get(
+    `https://slack.com/api/users.info`,
+    {
+      params: {
+        user: userId,
+      },
+      headers: {
+        Authorization: `Bearer ${process.env.NEXT_PUBLIC_SLACK_CHANNEL_ACCESS_TOKEN}`,
+        "Content-Type": "application/json",
+      },
+    }
+  );
 
-  // const rawBody = await status.text();
   console.log("status: ", status);
   return status.data.users;
 }
