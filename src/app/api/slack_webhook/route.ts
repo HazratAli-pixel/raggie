@@ -27,8 +27,11 @@ async function checkBotStatus(userId: string) {
     },
     headers: {
       Authorization: `Bearer ${process.env.NEXT_PUBLIC_SLACK_CHANNEL_ACCESS_TOKEN}`,
+      "Content-Type": "application/json",
     },
   });
+
+  // const rawBody = await status.text();
   console.log("status: ", status);
   return status.data.users;
 }
