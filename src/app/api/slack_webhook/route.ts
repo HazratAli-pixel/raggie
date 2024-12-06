@@ -1,8 +1,6 @@
 import axios from "axios";
-import { NextResponse } from "next/server";
-// const id: string = process.env.NEXT_PUBLIC_SLACK_BOT_ID!;
 import crypto from "crypto";
-const processedEvents: Record<string, number> = {};
+import { NextResponse } from "next/server";
 
 async function getOpenAIResponse(userMessage: string) {
   const response = await axios.post(
@@ -32,26 +30,14 @@ async function checkBotStatus(userId: string) {
       method: "GET",
       headers: headers,
     });
-
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-
     const data = await response.json();
-    console.log("Data:", data);
     return data.user;
   } catch (error) {
     console.error("Error:", error);
   }
-  // const status = await axios.get(`https://slack.com/api/users.info`, {
-  //   params: {
-  //     user: userId,
-  //   },
-  //   headers: {
-  //     Authorization: `Bearer ${process.env.NEXT_PUBLIC_SLACK_CHANNEL_ACCESS_TOKEN}`,
-  //     "Content-Type": "application/json",
-  //   },
-  // });
 }
 
 export async function POST(req: Request) {
@@ -79,44 +65,19 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
   }
   const payload = await JSON.parse(rawBody);
-  console.log("Payload :", payload);
   if (payload.type === "url_verification") {
     return NextResponse.json({ challenge: payload.challenge });
   }
-  // Handle other events (e.g., messages)
   if (payload.event) {
     const event = payload.event;
 
-    // Ignore bot messages
     if (event.bot_id) {
       return NextResponse.json({ status: "ignored" });
-    }
-
-    // Prevent duplicate processing of events
-    const eventId = payload.event_id;
-    const currentTime = Date.now();
-    if (processedEvents[eventId]) {
-      console.log(`Ignoring duplicate event: ${eventId}`);
-      return NextResponse.json({ status: "duplicate" });
-    }
-
-    processedEvents[eventId] = currentTime;
-
-    // Clean up old events
-    for (const oldEventId in processedEvents) {
-      if (currentTime - processedEvents[oldEventId] > 60 * 1000) {
-        delete processedEvents[oldEventId];
-      }
     }
 
     // Handle direct messages
     if (event.type === "message" && event.channel_type === "im") {
       const userMessage = event.text;
-      const userId = event.user;
-      // const channel = event.channel;
-
-      console.log(`Received DM from user ${userId}: ${userMessage}`);
-
       const responseText = await getOpenAIResponse(userMessage);
       await axios.post(
         "https://slack.com/api/chat.postMessage",
@@ -131,7 +92,6 @@ export async function POST(req: Request) {
           },
         }
       );
-
       return NextResponse.json({ status: "ok" });
     }
 
@@ -143,9 +103,6 @@ export async function POST(req: Request) {
       const botStaus = await checkBotStatus(mentions[1]);
       console.log("botStaus: ", botStaus);
       if (botStaus.is_bot) {
-        console.log(
-          `Bot mentioned by user ${userId} in channel: ${userMessages}`
-        );
         const responseText = await getOpenAIResponse(userMessages);
         await axios.post(
           "https://slack.com/api/chat.postMessage",
@@ -164,5 +121,4 @@ export async function POST(req: Request) {
       }
     }
   }
-  return NextResponse.json({ status: "No action taken" });
 }
