@@ -33,36 +33,36 @@ export async function POST(req: Request) {
   }
   const payload = await JSON.parse(rowBody);
   console.log("message Object", payload.events[0].message);
-
   console.log("payload", payload);
+
   if (req.body) {
     const userMessage: string = await payload.events[0].message.text;
     const userMessages = userMessage.replace(/@\w+/g, "").trim();
-    const mentionsWord: string[] = userMessage.match(/@\w+/g) || [];
-    const mentioned = userMessage.includes(String(mentionsWord[0]));
-    console.log("Info", mentioned, userMessage, userMessages, mentionsWord[0]);
+    // const mentionsWord: string[] = userMessage.match(/@\w+/g) || [];
+    // const mentioned = userMessage.includes(String(mentionsWord[0]));
     const openAIResponse = await getOpenAIResponse(userMessages);
-    if (mentioned) {
-      console.log("source", payload.events[0].source);
-      const user = await payload.events[0].source.userId;
-      console.log("User ID", payload.events[0].source.userId);
-      await axios.post(
-        `https://api.line.me/v2/bot/message/reply`,
-        {
-          replyToken: payload.events[0].replyToken,
-          messages: [{ type: "text", text: `@${user} ${openAIResponse}` }],
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${process.env.NEXT_PUBLIC_LINE_CHANNEL_ACCESS_TOKEN}`,
+    const userType = await payload.events[0].source.type;
+    if (userType === "group") {
+      const mentioned = await payload.events[0].message.mention.mentionees
+        .isSelf;
+      if (mentioned) {
+        await axios.post(
+          `https://api.line.me/v2/bot/message/reply`,
+          {
+            replyToken: payload.events[0].replyToken,
+            messages: [{ type: "text", text: openAIResponse }],
           },
-        }
-      );
-
+          {
+            headers: {
+              Authorization: `Bearer ${process.env.NEXT_PUBLIC_LINE_CHANNEL_ACCESS_TOKEN}`,
+            },
+          }
+        );
+      }
       return NextResponse.json({
         statusCode: 200,
       });
-    } else {
+    } else if (userType === "user") {
       await axios.post(
         `https://api.line.me/v2/bot/message/reply`,
         {
@@ -75,7 +75,6 @@ export async function POST(req: Request) {
           },
         }
       );
-
       return NextResponse.json({
         statusCode: 200,
       });
