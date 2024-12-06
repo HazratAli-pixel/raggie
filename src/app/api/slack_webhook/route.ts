@@ -39,7 +39,7 @@ async function checkBotStatus(userId: string) {
 
     const data = await response.json();
     console.log("Data:", data);
-    return data.data.users;
+    return data.user;
   } catch (error) {
     console.error("Error:", error);
   }
@@ -137,17 +137,10 @@ export async function POST(req: Request) {
 
     // Handle mentions in channels
     if (event.type === "app_mention") {
-      const userMessage = event.text;
       const userId = event.user;
-      // const channel = event.channel;
-      console.log("userMessage: ", userMessage);
-      const userMessages = userMessage.replace(/<@([A-Z0-9]+)>/g, "").trim();
-      console.log("userMessages: ", userMessages);
-      const mentions = userMessage.match(/<@([A-Z0-9]+)>/) || [];
-      const id = mentions[1];
-      console.log("mentions: ", mentions[1]);
-      const botStaus = await checkBotStatus(id);
-      // Check if the bot is mentioned
+      const userMessages = event.text.replace(/<@([A-Z0-9]+)>/g, "").trim();
+      const mentions = event.text.match(/<@([A-Z0-9]+)>/) || [];
+      const botStaus = await checkBotStatus(mentions[1]);
       console.log("botStaus: ", botStaus);
       if (botStaus.is_bot) {
         console.log(
