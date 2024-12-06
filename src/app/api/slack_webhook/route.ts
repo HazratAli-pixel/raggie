@@ -30,7 +30,7 @@ async function checkBotStatus(userId: string) {
     }
   );
   console.log("status: ", status);
-  return status;
+  return status.data.users;
 }
 
 export async function POST(req: Request) {
@@ -125,7 +125,7 @@ export async function POST(req: Request) {
       const botStaus = await checkBotStatus(mentions[1]);
       // Check if the bot is mentioned
       console.log("botStaus: ", botStaus);
-      if (botStaus) {
+      if (botStaus.is_bot) {
         console.log(
           `Bot mentioned by user ${userId} in channel ${channel}: ${userMessages}`
         );
