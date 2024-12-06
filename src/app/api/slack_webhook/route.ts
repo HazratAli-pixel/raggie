@@ -44,10 +44,8 @@ export async function POST(req: Request) {
   if (computedSignature !== signature) {
     return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
   }
-  console.log("second if okay");
   const payload = await JSON.parse(rawBody);
   console.log("Payload :", payload);
-  console.log("Request: ", req);
   if (payload.type === "url_verification") {
     return NextResponse.json({ challenge: payload.challenge });
   }
@@ -85,8 +83,7 @@ export async function POST(req: Request) {
 
       console.log(`Received DM from user ${userId}: ${userMessage}`);
 
-      const responseText = await getOpenAIResponse(payload.msg);
-
+      const responseText = await getOpenAIResponse(userMessage);
       await axios.post(
         "https://slack.com/api/chat.postMessage",
         {
@@ -115,7 +112,7 @@ export async function POST(req: Request) {
         console.log(
           `Bot mentioned by user ${userId} in channel ${channel}: ${userMessage}`
         );
-        const responseText = await getOpenAIResponse(payload.msg);
+        const responseText = await getOpenAIResponse(userMessage);
         await axios.post(
           "https://slack.com/api/chat.postMessage",
           {
