@@ -1,6 +1,8 @@
 import axios from "axios";
-import crypto from "crypto";
 import { NextResponse } from "next/server";
+// const id: string = process.env.NEXT_PUBLIC_SLACK_BOT_ID!;
+import crypto from "crypto";
+const processedEvents: Record<string, number> = {};
 
 async function getOpenAIResponse(userMessage: string) {
   const response = await axios.post(
@@ -30,6 +32,7 @@ async function checkBotStatus(userId: string) {
       method: "GET",
       headers: headers,
     });
+
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
@@ -68,11 +71,30 @@ export async function POST(req: Request) {
   if (payload.type === "url_verification") {
     return NextResponse.json({ challenge: payload.challenge });
   }
+  // Handle other events (e.g., messages)
   if (payload.event) {
     const event = payload.event;
 
+    // Ignore bot messages
     if (event.bot_id) {
       return NextResponse.json({ status: "ignored" });
+    }
+
+    // Prevent duplicate processing of events
+    const eventId = payload.event_id;
+    const currentTime = Date.now();
+    if (processedEvents[eventId]) {
+      console.log(`Ignoring duplicate event: ${eventId}`);
+      return NextResponse.json({ status: "duplicate" });
+    }
+
+    processedEvents[eventId] = currentTime;
+
+    // Clean up old events
+    for (const oldEventId in processedEvents) {
+      if (currentTime - processedEvents[oldEventId] > 60 * 1000) {
+        delete processedEvents[oldEventId];
+      }
     }
 
     // Handle direct messages
@@ -92,6 +114,7 @@ export async function POST(req: Request) {
           },
         }
       );
+
       return NextResponse.json({ status: "ok" });
     }
 
@@ -103,6 +126,9 @@ export async function POST(req: Request) {
       const botStaus = await checkBotStatus(mentions[1]);
       console.log("botStaus: ", botStaus);
       if (botStaus.is_bot) {
+        console.log(
+          `Bot mentioned by user ${userId} in channel: ${userMessages}`
+        );
         const responseText = await getOpenAIResponse(userMessages);
         await axios.post(
           "https://slack.com/api/chat.postMessage",
@@ -121,4 +147,5 @@ export async function POST(req: Request) {
       }
     }
   }
+  return NextResponse.json({ status: "No action taken" });
 }
