@@ -42,9 +42,7 @@ export async function POST(req: Request) {
     const mentioned = userMessage.includes(String(mentionsWord[0]));
     console.log("Info", mentioned, userMessage, userMessages, mentionsWord[0]);
     const openAIResponse = await getOpenAIResponse(userMessages);
-    console.log("User ID", payload.events[0].message.source[0]);
     if (mentioned) {
-      // const user = await payload.events[0].message.source.userId;
       await axios.post(
         `https://api.line.me/v2/bot/message/reply`,
         {
