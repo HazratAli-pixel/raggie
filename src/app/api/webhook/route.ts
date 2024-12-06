@@ -44,12 +44,12 @@ export async function POST(req: Request) {
     const openAIResponse = await getOpenAIResponse(userMessages);
     console.log("User ID", payload.events[0].message.source);
     if (mentioned) {
-      const user = await payload.events[0].message.source.userId;
+      // const user = await payload.events[0].message.source.userId;
       await axios.post(
         `https://api.line.me/v2/bot/message/reply`,
         {
           replyToken: payload.events[0].replyToken,
-          messages: [{ type: "text", text: `@${user} ${openAIResponse}` }],
+          messages: [{ type: "text", text: openAIResponse }],
         },
         {
           headers: {
