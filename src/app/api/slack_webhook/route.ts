@@ -37,7 +37,7 @@ export async function POST(req: Request) {
   }
 
   const hmac = crypto
-    .createHmac("sha256", "ced58b91a6d8ae5850ce389e88d52d46")
+    .createHmac("sha256", "bf70159e7abaf31fd077d8095501ad1a")
     .update(rawBody)
     .digest("hex");
   const calculatedSignature = `v0=${hmac}`;
@@ -113,7 +113,7 @@ export async function POST(req: Request) {
       const channel = event.channel;
 
       // Check if the bot is mentioned
-      if (userMessage.includes(`<@A07TU95HH0X>`)) {
+      if (userMessage.includes(`<@A07UXPB98QY>`)) {
         console.log(
           `Bot mentioned by user ${userId} in channel ${channel}: ${userMessage}`
         );
