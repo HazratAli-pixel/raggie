@@ -42,7 +42,8 @@ export async function POST(req: Request) {
   const hash = crypto
     .createHmac("sha256", "bf70159e7abaf31fd077d8095501ad1a")
     .update(rawBody)
-    .digest("hex");
+    .digest("base64");
+  // .digest("hex");
   const calculatedSignature = `v0=${hash}`;
   console.log("hash: ", hash);
 
