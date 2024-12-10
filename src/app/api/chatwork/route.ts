@@ -52,8 +52,7 @@ export async function POST(req: Request) {
   // if (signature !== hash) {
   //   return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
   // }
-
-  const payload = await req.json();
+  const payload = await JSON.parse(body);
   console.log("paylooad: ", payload);
   const userMessages: string = payload.webhook_event.body;
   console.log("userMessages: ", userMessages);
