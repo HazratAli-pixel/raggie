@@ -40,7 +40,6 @@ async function getUserName(userid: number) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
     const data = await response.json();
-    console.log("data: ", data);
     if (data.length >= 1) {
       const username: Usertype | undefined = await data.find(
         (user: Usertype) => user.account_id == userid
@@ -75,7 +74,7 @@ export async function POST(req: Request) {
     const userMessage = userMessages.replace(/^(\[To:\d+\]\w+)/, "").trim();
     const openAIResponse = await getOpenAIResponse(userMessage);
 
-    const username = await getUserName(payload.webhook_event.to_account_id);
+    const username = await getUserName(payload.webhook_event.from_account_id);
     console.log(
       "username: ",
       payload.webhook_event.to_account_id,
@@ -108,9 +107,10 @@ export async function POST(req: Request) {
         error: "An error occurred",
       });
     }
-  } else if (
+  }
+  if (
     payload.webhook_event_type === "mention_to_me" &&
-    payload.webhook_event.room_id === "377312248"
+    payload.webhook_event.room_id == "377312248"
   ) {
     const openAIResponse = await getOpenAIResponse(userMessages);
     console.log("openAIResponse: ", openAIResponse);
