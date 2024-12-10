@@ -40,10 +40,11 @@ async function getUserName(userid: number) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
     const data = await response.json();
+    console.log("data: ", data);
     const users: Usertype[] = data ?? [];
     if (users.length >= 1) {
       const username: Usertype | undefined = await users.find(
-        (user) => user.account_id === userid
+        (user) => user.account_id == userid
       );
       if (username) return username.name;
     }
@@ -109,7 +110,7 @@ export async function POST(req: Request) {
       });
     }
   } else if (
-    payload.webhook_event_type === "message_created" &&
+    payload.webhook_event_type === "mention_to_me" &&
     payload.webhook_event.room_id === "377312248"
   ) {
     const openAIResponse = await getOpenAIResponse(userMessages);
