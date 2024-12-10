@@ -110,7 +110,7 @@ export async function POST(req: Request) {
   }
   if (
     payload.webhook_event_type === "mention_to_me" &&
-    payload.webhook_event.room_id == "377312248"
+    payload.webhook_event.room_id === "377312248"
   ) {
     const openAIResponse = await getOpenAIResponse(userMessages);
     console.log("openAIResponse: ", openAIResponse);
