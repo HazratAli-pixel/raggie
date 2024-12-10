@@ -41,10 +41,9 @@ async function getUserName(userid: number) {
     }
     const data = await response.json();
     console.log("data: ", data);
-    const users: Usertype[] = data ?? [];
-    if (users.length >= 1) {
-      const username: Usertype | undefined = await users.find(
-        (user) => user.account_id == userid
+    if (data.length >= 1) {
+      const username: Usertype | undefined = await data.find(
+        (user: Usertype) => user.account_id == userid
       );
       if (username) return username.name;
     }
@@ -76,10 +75,10 @@ export async function POST(req: Request) {
     const userMessage = userMessages.replace(/^(\[To:\d+\]\w+)/, "").trim();
     const openAIResponse = await getOpenAIResponse(userMessage);
 
-    const username = await getUserName(payload.webhook_event.from_account_id);
+    const username = await getUserName(payload.webhook_event.to_account_id);
     console.log(
       "username: ",
-      payload.webhook_event.from_account_id,
+      payload.webhook_event.to_account_id,
       "--",
       username
     );
