@@ -101,7 +101,7 @@ export async function POST(req: Request) {
     payload.webhook_event_type === "message_created" &&
     payload.webhook_event.room_id === "377312248"
   ) {
-    const openAIResponse = await getOpenAIResponse(userMessage);
+    const openAIResponse = await getOpenAIResponse(userMessages);
     console.log("openAIResponse: ", openAIResponse);
     const chatworkRoomId = payload.webhook_event.room_id;
     console.log("chatworkRoomId: ", chatworkRoomId);
