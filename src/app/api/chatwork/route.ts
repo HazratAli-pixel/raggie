@@ -55,15 +55,13 @@ export async function POST(req: Request) {
   // }
   const payload = await JSON.parse(body);
   console.log("paylooad: ", payload);
-  const userMessages: string = payload.webhook_event.body;
-  console.log("userMessages: ", userMessages);
-  const userMessage: string = userMessages.slice(12);
-  console.log("userMessage slice: ", userMessage);
 
+  const userMessages: string = payload.webhook_event.body;
   if (
     payload.webhook_event_type === "mention_to_me" &&
     payload.webhook_event.room_id != "377312248"
   ) {
+    const userMessage = userMessages.replace(/^(\[To:\d+\]\w+)/, "").trim();
     const openAIResponse = await getOpenAIResponse(userMessage);
 
     const username = await getUserName(payload.webhook_event.from_account_id);
