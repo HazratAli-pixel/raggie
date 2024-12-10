@@ -40,12 +40,10 @@ async function getUserName(userid: number) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
     const data = await response.json();
-    // const users: Usertype[] = data ?? [];
-    console.log("Data: ", data);
-    if (data.length >= 1) {
-      const username: Usertype | undefined = await data.find(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (user: any) => user.account_id === userid
+    const users: Usertype[] = data ?? [];
+    if (users.length >= 1) {
+      const username: Usertype | undefined = await users.find(
+        (user) => user.account_id === userid
       );
       if (username) return username.name;
     }
