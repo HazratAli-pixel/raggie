@@ -45,7 +45,7 @@ export async function POST(req: Request) {
   const body = await req.text();
   console.log("signature: ", signature);
   const hash = crypto
-    .createHmac("sha256", chatworkApiToken!)
+    .createHmac("sha256", chatworkApiToken ?? "")
     .update(body)
     .digest("base64");
   console.log("hash: ", hash);
