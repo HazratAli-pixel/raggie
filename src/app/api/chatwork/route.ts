@@ -31,6 +31,7 @@ async function getUserName(userid: number) {
       "X-ChatWorkToken": chatworkApiToken,
     },
   });
+  console.log("response: ", response);
   const users: Usertype[] = response.data ?? [];
   if (users.length >= 1) {
     const username: Usertype | undefined = await users.find(
