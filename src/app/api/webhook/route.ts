@@ -23,7 +23,9 @@ export async function POST(req: Request) {
   console.log("Request: ", req);
   if (req.body) {
     const userMessage: string = await payload.events[0].message.text;
-    const mentioned = userMessage.includes("@ALEX");
+    const mentioned = userMessage.includes(
+      process.env.NEXT_PUBLIC_LINE_BOT_NAME!
+    );
     console.log("Mention", mentioned, userMessage);
     const openAIResponse = await getOpenAIResponse(userMessage);
     if (mentioned) {
