@@ -44,7 +44,10 @@ export async function POST(req: Request) {
   const userMessages: string = payload.webhook_event.body;
   const userMessage: string = userMessages.slice(12);
 
-  if (payload.webhook_event_type === "mention_to_me") {
+  if (
+    payload.webhook_event_type === "mention_to_me" &&
+    payload.webhook_event.room_id != "377312248"
+  ) {
     const openAIResponse = await getOpenAIResponse(userMessage);
 
     const username = await getUserName(payload.webhook_event.from_account_id);
@@ -55,6 +58,37 @@ export async function POST(req: Request) {
         `https://api.chatwork.com/v2/rooms/${chatworkRoomId}/messages`,
         new URLSearchParams({
           body: `[To:${payload.webhook_event.from_account_id}]${username}\n${openAIResponse}`,
+        }).toString(),
+        {
+          headers: {
+            "X-ChatWorkToken": chatworkApiToken,
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+        }
+      );
+      return NextResponse.json({
+        statusCode: 200,
+        openaiResponse: openAIResponse,
+      });
+    } catch (error) {
+      console.error("Chatwork API Error:", error);
+      return NextResponse.json({
+        statusCode: 500,
+        error: "An error occurred",
+      });
+    }
+  } else if (
+    payload.webhook_event_type === "message_created" &&
+    payload.webhook_event.room_id === "377312248"
+  ) {
+    const openAIResponse = await getOpenAIResponse(userMessage);
+    const chatworkRoomId = payload.webhook_event.room_id;
+
+    try {
+      await axios.post(
+        `https://api.chatwork.com/v2/rooms/${chatworkRoomId}/messages`,
+        new URLSearchParams({
+          body: openAIResponse,
         }).toString(),
         {
           headers: {
