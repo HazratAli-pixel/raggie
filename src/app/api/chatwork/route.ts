@@ -46,13 +46,13 @@ export async function POST(req: Request) {
   console.log("signature: ", signature);
   const hash = crypto
     .createHmac("sha256", chatworkApiToken!)
-    .update(body, "utf8")
+    .update(body)
     .digest("base64");
+  console.log("hash: ", hash);
   if (signature !== hash) {
     return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
   }
 
-  console.log("hash: ", hash);
   const payload = await req.json();
   console.log("paylooad: ", payload);
   const userMessages: string = payload.webhook_event.body;
