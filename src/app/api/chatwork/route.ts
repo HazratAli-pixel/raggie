@@ -26,18 +26,31 @@ async function getOpenAIResponse(userMessage: string) {
 }
 
 async function getUserName(userid: number) {
-  const response = await axios.get(`https://api.chatwork.com/v2/contacts`, {
-    headers: {
-      "X-ChatWorkToken": chatworkApiToken,
-    },
-  });
-  console.log("response: ", response);
-  const users: Usertype[] = response.data ?? [];
-  if (users.length >= 1) {
-    const username: Usertype | undefined = await users.find(
-      (user) => user.account_id === userid
-    );
-    if (username) return username.name;
+  const url = `https://api.chatwork.com/v2/contacts`;
+  const headers = {
+    "X-ChatWorkToken": chatworkApiToken ?? "",
+  };
+  try {
+    const response = await fetch(url, {
+      method: "GET",
+      headers: headers,
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const data = await response.json();
+    // const users: Usertype[] = data ?? [];
+    console.log("Data: ", data);
+    if (data.length >= 1) {
+      const username: Usertype | undefined = await data.find(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (user: any) => user.account_id === userid
+      );
+      if (username) return username.name;
+    }
+  } catch (error) {
+    console.error("Error:", error);
   }
 }
 
