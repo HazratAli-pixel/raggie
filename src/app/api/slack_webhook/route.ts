@@ -101,6 +101,7 @@ export async function POST(req: Request) {
     if (event.type === "message" && event.channel_type === "im") {
       const userMessage = event.text;
       const responseText = await getOpenAIResponse(userMessage);
+      console.log("responseText: ", responseText);
       await axios.post(
         "https://slack.com/api/chat.postMessage",
         {
@@ -126,6 +127,7 @@ export async function POST(req: Request) {
       const botStaus = await checkBotStatus(mentions[1]);
       if (botStaus.is_bot) {
         const responseText = await getOpenAIResponse(userMessages);
+        console.log("responseText: ", responseText);
         await axios.post(
           "https://slack.com/api/chat.postMessage",
           {
